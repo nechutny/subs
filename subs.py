@@ -34,7 +34,6 @@ def subtitlesByLink(url):
 		sys.exit(1);
 	data = http.read();
 
-	res = [];
 	try:
 		dom = minidom.parseString(data);
 	except xml.parsers.expat.ExpatError:
@@ -45,7 +44,8 @@ def subtitlesByLink(url):
 		if len(result.getElementsByTagName("MovieName")) > 0:
 			return result.getElementsByTagName("IDSubtitle")[0].getAttribute("LinkDownload");
 
-	return res;
+	print  >> sys.stderr, "Subtitles not found.";
+	sys.exit(1);
 
 def downloadSubtitle(link,fhash):
 	subs = urllib2.urlopen(link);
@@ -90,7 +90,8 @@ def hashFile(name):
 		return returnedhash
 
 	except(IOError):
-		return "IOError"
+		print  >> sys.stderr, "Can't open file.";
+		sys.exit(1);
 
 def unzip(fhash,filename):
 	(prefix, sep, suffix) = filename.rpartition('.')
@@ -112,6 +113,8 @@ def unzip(fhash,filename):
 						
 	except zipfile.BadZipfile:
 		print  >> sys.stderr, "Can't extract subtitles from downloaded file.";
+		os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
+		sys.exit(1);
 
 
 
