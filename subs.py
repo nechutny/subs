@@ -5,10 +5,10 @@
 	Author:		Stanislav Nechutny
 	License:	GPLv2
 
-	Revision:	1
+	Revision:	2
 	Repository:	https://github.com/nechutny/subs
 	Created:	2014-05-31 20:13
-	Modified:	2014-05-31 20:13
+	Modified:	2014-05-31 20:25
 	
 	
 
@@ -22,7 +22,7 @@ from xml.dom import minidom
 import xml.parsers.expat
 import struct
 import shutil
-
+import tempfile
 
 
 
@@ -53,7 +53,7 @@ def downloadSubtitle(link,fhash):
 		print >> sys.stderr, "Limit reached - can't download."
 		sys.exit(1);
 
-	output = open("/tmp/"+fhash+".zip",'wb');
+	output = open(tempfile.gettempdir()+"/"+fhash+".zip",'wb');
 	output.write(subs.read());
 	output.close();
 
@@ -96,7 +96,7 @@ def unzip(fhash,filename):
 	(prefix, sep, suffix) = filename.rpartition('.')
 
 	try:
-		with zipfile.ZipFile("/tmp/"+fhash+".zip") as zf:
+		with zipfile.ZipFile(tempfile.gettempdir()+"/"+fhash+".zip") as zf:
 			for member in zf.infolist():
 				words = member.filename.split('/')
 				path = "./"
@@ -107,8 +107,8 @@ def unzip(fhash,filename):
 					path = os.path.join(path, word);
 
 				if re.match(r".*[.](srt|sub)$",words[0]) != None:
-					zf.extract(member, "/tmp/");
-					shutil.move("/tmp/"+words[0], prefix+"."+(re.findall(r".*[.](srt|sub)$",words[0])[0]));
+					zf.extract(member, tempfile.gettempdir()+"/");
+					shutil.move(tempfile.gettempdir()+"/"+words[0], prefix+"."+(re.findall(r".*[.](srt|sub)$",words[0])[0]));
 						
 	except zipfile.BadZipfile:
 		print  >> sys.stderr, "Can't extract subtitles from downloaded file.";
@@ -138,4 +138,4 @@ downloadSubtitle(url,fhash)
 
 unzip(fhash, filename)
 
-os.unlink("/tmp/"+fhash+".zip");
+os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
