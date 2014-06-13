@@ -119,26 +119,26 @@ def unzip(fhash,filename):
 
 
 if len(sys.argv) < 2:
-	print "Try run with "+sys.argv[0]+" [-l eng] filename"
+	print "Try run with "+sys.argv[0]+" [-l eng] filename(s)"
 	sys.exit(1)
-elif len(sys.argv) == 4 and sys.argv[1] == "-l":
+elif len(sys.argv) >= 4 and sys.argv[1] == "-l":
 	lang = sys.argv[2]
 	filename = sys.argv[3]
-elif len(sys.argv) == 2:
+	del sys.argv[0]
+	del sys.argv[0]
+	del sys.argv[0]
+elif len(sys.argv) >= 2:
 	lang = "eng"
-	filename = sys.argv[1]
+	del sys.argv[0]
 else:
 	print "Try run with "+sys.argv[0]+" [-l eng] filename"
 	sys.exit(1)
-	
-fhash = hashFile(filename)
 
-url = "http://www.opensubtitles.org/en/search/sublanguageid-"+lang+"/moviehash-"+fhash+"/xml"
-
-url = subtitlesByLink(url)
-
-downloadSubtitle(url,fhash)
-
-unzip(fhash, filename)
-
-os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
+for filename in sys.argv:
+	fhash = hashFile(filename)
+	url = "http://www.opensubtitles.org/en/search/sublanguageid-"+lang+"/moviehash-"+fhash+"/xml"
+	url = subtitlesByLink(url)
+	downloadSubtitle(url,fhash)
+	unzip(fhash, filename)
+	os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
+	print "Downloaded "+lang+" subtitles for "+filename; 
