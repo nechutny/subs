@@ -23,6 +23,7 @@ import xml.parsers.expat
 import struct
 import shutil
 import tempfile
+import locale
 
 
 
@@ -116,7 +117,12 @@ def unzip(fhash,filename):
 		os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
 		sys.exit(1);
 
-
+def defaultLang():
+	lang = {"ab":"abk","aa":"aar","af":"afr","sq":"sqi","am":"amh","ar":"ara","hy":"hye","as":"asm","ay":"aym","az":"aze","ba":"bak","eu":"eus","bn":"ben","bh":"bih","bi":"bis","be":"bre","bg":"bul","my":"mya","be":"bel","ca":"cat","zh":"zho","co":"cos","cs":"cze","da":"dan","nl":"nla","dz":"dzo","en":"eng","eo":"epo","et":"est","fo":"fao","fj":"fij","fi":"fin","fr":"fre","fy":"fry","gd":"gdh","gl":"glg","ka":"kat","de":"ger","el":"gre","kl":"kal","gn":"grn","gu":"guj","ha":"hau","he":"heb","hi":"hin","hu":"hun","is":"isl","id":"ind","ia":"ina","- ":"ine","iu":"iku","ik":"ipk","ga":"gai","it":"ita","ja":"jpn","jv":"jav","jw":"jaw","kn":"kan","ks":"kas","kk":"kaz","km":"khm","rw":"kin","ky":"kir","ko":"kor","ku":"kur","oc":"oci","lo":"lao","la":"lat","lv":"lav","ln":"lin","lt":"lit","mk":"mak","mg":"mlg","ms":"/ms","ml":"mlt","mi":"mri","mr":"mar","mo":"mol","mn":"mon","na":"nau","ne":"nep","no":"nor","or":"ori","om":"orm","pa":"pan","fa":"fas","pl":"pol","pt":"por","ps":"pus","qu":"que","rm":"roh","ro":"ron","rn":"run","ru":"rus","sm":"smo","sg":"sag","sa":"san","sh":"scr","sn":"sna","sd":"snd","si":"sin","- ":"sit","ss":"ssw","sk":"slo","sl":"slv","so":"som","st":"sot","es":"esl","su":"sun","sw":"swa","sv":"swe","tl":"tgl","tg":"tgk","ta":"tam","tt":"tat","te":"tel","th":"tha","bo":"bod","ti":"tir","to":"tog","ts":"tso","tn":"tsn","tr":"tur","tk":"tuk","tw":"twi","ug":"uig","uk":"ukr","ur":"urd","uz":"uzb","vi":"vie","vo":"vol","cy":"cym","wo":"wol","xh":"xho","yi":"yid","yo":"yor","za":"zha","zu":"zul"};
+	try:
+		return lang[ locale.getdefaultlocale()[0][0:2] ];
+	except KeyError:
+		return "eng"
 
 if len(sys.argv) < 2:
 	print "Try run with "+sys.argv[0]+" [-l eng] filename(s)"
@@ -128,7 +134,7 @@ elif len(sys.argv) >= 4 and sys.argv[1] == "-l":
 	del sys.argv[0]
 	del sys.argv[0]
 elif len(sys.argv) >= 2:
-	lang = "eng"
+	lang = defaultLang();
 	del sys.argv[0]
 else:
 	print "Try run with "+sys.argv[0]+" [-l eng] filename"
