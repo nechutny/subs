@@ -10,7 +10,7 @@ How use it?
 Basic usage is:
 $./subs.py ../Movies/movie.avi
 
-Default language for searched subtitles is English (eng), but you can specify language, for example:
+Default language for searched subtitles is system language. If it can't detect, then it fall to English (eng), but you can specify language, for example:
 $./subs.py -l cze ../Movies/movie.avi
 
 You can also download at once subtitles for more files:
