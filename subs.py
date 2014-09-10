@@ -5,10 +5,10 @@
 	Author:		Stanislav Nechutny
 	License:	GPLv2
 
-	Revision:	2
+	Revision:	4
 	Repository:	https://github.com/nechutny/subs
 	Created:	2014-05-31 20:13
-	Modified:	2014-05-31 20:25
+	Modified:	2014-09-10 20:24
 	
 	
 
@@ -24,6 +24,7 @@ import struct
 import shutil
 import tempfile
 import locale
+import getopt
 
 
 
@@ -96,12 +97,15 @@ def hashFile(name):
 
 def unzip(fhash,filename):
 	(prefix, sep, suffix) = filename.rpartition('.')
-
+	if remove_directory:
+		prefix = directory+"/"+os.path.basename(prefix);
+	found = 0;
 	try:
 		with zipfile.ZipFile(tempfile.gettempdir()+"/"+fhash+".zip") as zf:
 			for member in zf.infolist():
 				words = member.filename.split('/')
 				path = "./"
+				
 				for word in words[:-1]:
 					drive, word = os.path.splitdrive(word);
 					head, word = os.path.split(word);
@@ -110,10 +114,17 @@ def unzip(fhash,filename):
 
 				if re.match(r".*[.](srt|sub)$",words[0]) != None:
 					zf.extract(member, tempfile.gettempdir()+"/");
+					print prefix
 					shutil.move(tempfile.gettempdir()+"/"+words[0], prefix+"."+(re.findall(r".*[.](srt|sub)$",words[0])[0]));
+					found += 1;
 						
 	except zipfile.BadZipfile:
 		print  >> sys.stderr, "Can't extract subtitles from downloaded file.";
+		os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
+		sys.exit(1);
+
+	if found == 0:
+		print  >> sys.stderr, "Subtitle file not found in archive.";
 		os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
 		sys.exit(1);
 
@@ -124,21 +135,42 @@ def defaultLang():
 	except KeyError:
 		return "eng"
 
-if len(sys.argv) < 2:
-	print "Try run with "+sys.argv[0]+" [-l eng] filename(s)"
-	sys.exit(1)
-elif len(sys.argv) >= 4 and sys.argv[1] == "-l":
-	lang = sys.argv[2]
-	filename = sys.argv[3]
-	del sys.argv[0]
-	del sys.argv[0]
-	del sys.argv[0]
-elif len(sys.argv) >= 2:
-	lang = defaultLang();
-	del sys.argv[0]
-else:
-	print "Try run with "+sys.argv[0]+" [-l eng] filename"
-	sys.exit(1)
+lang = defaultLang();
+directory = -1;
+
+def removeFromListByValue(where, search):
+	for i in range(0, len(where)):
+		if where[i] == search:
+			del where[i];
+			del where[i];
+			return where;
+	return where;
+
+remove_lang = False;
+remove_directory = False;
+
+try:
+	opts, args = getopt.getopt(sys.argv[1:],"hl:d:")
+except getopt.GetoptError:
+	print "Try run with "+sys.argv[0]+" [-l eng] [-d directory] filename(s)"
+	sys.exit(2)
+for opt, arg in opts:
+	if opt == '-h':
+		print "Try run with "+sys.argv[0]+" [-l eng] [-d directory] filename(s)"
+		sys.exit()
+	elif opt == '-l':
+		lang = arg
+		remove_lang = True;
+	elif opt == '-d':
+		directory = arg
+		remove_directory = True;
+
+del sys.argv[0];
+if remove_directory:
+	sys.argv = removeFromListByValue(sys.argv,"-d");
+if remove_lang:
+	sys.argv = removeFromListByValue(sys.argv,"-l");
+
 
 for filename in sys.argv:
 	fhash = hashFile(filename)
