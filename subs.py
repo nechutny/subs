@@ -114,7 +114,6 @@ def unzip(fhash,filename):
 
 				if re.match(r".*[.](srt|sub)$",words[0]) != None:
 					zf.extract(member, tempfile.gettempdir()+"/");
-					print prefix
 					shutil.move(tempfile.gettempdir()+"/"+words[0], prefix+"."+(re.findall(r".*[.](srt|sub)$",words[0])[0]));
 					found += 1;
 						
