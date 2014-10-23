@@ -8,7 +8,7 @@
 	Revision:	5
 	Repository:	https://github.com/nechutny/subs
 	Created:	2014-05-31 20:13
-	Modified:	2014-09-10 20:24
+	Modified:	2014-10-23 11:19
 	
 	
 
@@ -130,7 +130,7 @@ def defaultLang():
 	except KeyError:
 		return "eng"
 
-blocked = ["MultiShare", "www.geekshop.cz"];
+blocked = ["MultiShare", "www.geekshop.cz","Open Subtitles MKV Player"];
 
 def adBlock(filename):
 	if re.match(r".*[.](srt)$",filename) != None:
@@ -142,6 +142,7 @@ def adBlock(filename):
 			for b in blocked:
 				if val[0].find(b) != -1:
 					del data[index]
+					index -= 1;
 					break
 			index += 1
 		f.seek(0)
@@ -157,6 +158,7 @@ def adBlock(filename):
 			for b in blocked:
 				if val.find(b) != -1:
 					del data[index]
+					index -= 1;
 					break
 			index += 1
 		f.seek(0)
@@ -182,7 +184,7 @@ remove_directory = False;
 
 
 def printHelp():
-	print "You can run "+sys.argv[0]+" with this arguments: ";
+	print "You can run "+sys.argv[0]+" with these arguments: ";
 	print "\t -a\t\t\t Try remove adds from subtitles"
 	print "\t -d directory\t\t Directory as destination for subtitle file(s)"
 	print "\t -l lang_code\t\t Set subtitle language to specific value. Default is detected from OS, or it fallback to eng."
