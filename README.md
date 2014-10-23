@@ -26,5 +26,9 @@ You can also download at once subtitles for more files:
 or via bash expansion:
 
     $./subs.py ../Movies/*.avi
+    
+And what about removing advertisement in subtitles (annonying link etc.)? Just use (experimental) -a argument
+
+    $./subs.py -a ../Movies/*.avi
 
 and of course you can combine it with -l lang, or -d directory argument.
