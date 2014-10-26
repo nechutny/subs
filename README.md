@@ -1,7 +1,9 @@
 subs
 ====
 
-Subtitle downloader for video files from opensubtitles.org
+Subtitle downloader for video files from opensubtitles.org.
+
+Article in czech language: http://blog.nechutny.net/?detail=10
 
 
 How use it?
