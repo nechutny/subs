@@ -8,9 +8,9 @@
 	Revision:	5
 	Repository:	https://github.com/nechutny/subs
 	Created:	2014-05-31 20:13
-	Modified:	2014-10-23 11:19
-	
-	
+	Modified:	2015-04-18 20:53
+
+
 
 '''
 import sys;
@@ -40,9 +40,9 @@ def subtitlesByLink(url):
 	except xml.parsers.expat.ExpatError:
 		raise Exception('Invalid XML')
 	results = dom.getElementsByTagName('subtitle');
-	for result in results:
-		if len(result.getElementsByTagName("MovieName")) > 0:
-			return result.getElementsByTagName("IDSubtitle")[0].getAttribute("LinkDownload");
+	for i in range(len(results)-nth):
+		if len(results[i+nth].getElementsByTagName("MovieName")) > 0:
+			return results[i+nth].getElementsByTagName("IDSubtitle")[0].getAttribute("LinkDownload");
 
 	raise Exception('Subtitles not found')
 
@@ -62,8 +62,8 @@ def hashFile(name):
 	try:
 		longlongformat = 'q'  # long long
 		bytesize = struct.calcsize(longlongformat)
-		
-		f = open(name, "rb") 
+
+		f = open(name, "rb")
 
 		filesize = os.path.getsize(name)
 		hash = filesize
@@ -101,7 +101,7 @@ def unzip(fhash,filename):
 			for member in zf.infolist():
 				words = member.filename.split('/')
 				path = "./"
-				
+
 				for word in words[:-1]:
 					drive, word = os.path.splitdrive(word);
 					head, word = os.path.split(word);
@@ -114,7 +114,7 @@ def unzip(fhash,filename):
 					if removeAd:
 						adBlock(prefix+"."+(re.findall(r".*[.](srt|sub|ass)$",words[0].lower())[0]));
 					found += 1;
-						
+
 	except zipfile.BadZipfile:
 		os.unlink(tempfile.gettempdir()+"/"+fhash+".zip");
 		raise Exception("Can't extract subtitles from downloaded file.")
@@ -130,7 +130,12 @@ def defaultLang():
 	except KeyError:
 		return "eng"
 
-blocked = ["MultiShare", "www.geekshop.cz","Open Subtitles MKV Player"];
+blocked = [
+	"MultiShare",
+	"www.geekshop.cz",
+	"Open Subtitles MKV Player",
+	"www.filebot"
+	];
 
 def adBlock(filename):
 	if re.match(r".*[.](srt)$",filename) != None:
@@ -149,7 +154,7 @@ def adBlock(filename):
 		for d in data:
 			f.write(d[0])
 		f.truncate()
-		
+
 	elif re.match(r".*[.](sub|ass)$",filename) != None:
 		f = open(filename,"r+")
 		data = f.readlines()
@@ -169,6 +174,7 @@ def adBlock(filename):
 lang = defaultLang();
 directory = -1;
 removeAd = False;
+nth = 0;
 
 def removeFromListByValue(where, search, num = 2):
 	for i in range(0, len(where)):
@@ -181,6 +187,7 @@ def removeFromListByValue(where, search, num = 2):
 
 remove_lang = False;
 remove_directory = False;
+remove_nth = False;
 
 
 def printHelp():
@@ -188,10 +195,11 @@ def printHelp():
 	print "\t -a\t\t\t Try remove adds from subtitles"
 	print "\t -d directory\t\t Directory as destination for subtitle file(s)"
 	print "\t -l lang_code\t\t Set subtitle language to specific value. Default is detected from OS, or it fallback to eng."
+	print "\t -n nth\t\t\t Download nth subtitles. When script find more than one subtitles, then it select first. This option allow specify what to download"
 	print "\t -h\t\t\t Print this help"
 
 try:
-	opts, args = getopt.getopt(sys.argv[1:],"hal:d:")
+	opts, args = getopt.getopt(sys.argv[1:],"hal:d:n:")
 except getopt.GetoptError:
 	printHelp();
 	sys.exit(2)
@@ -202,6 +210,9 @@ for opt, arg in opts:
 	elif opt == '-l':
 		lang = arg
 		remove_lang = True;
+	elif opt == '-n':
+		nth = int(arg)
+		remove_nth = True;
 	elif opt == '-a':
 		removeAd = True;
 	elif opt == '-d':
@@ -213,6 +224,8 @@ if remove_directory:
 	sys.argv = removeFromListByValue(sys.argv,"-d");
 if remove_lang:
 	sys.argv = removeFromListByValue(sys.argv,"-l");
+if remove_nth:
+	sys.argv = removeFromListByValue(sys.argv,"-n");
 if removeAd:
 	sys.argv = removeFromListByValue(sys.argv,"-a",1);
 
